@@ -1,4 +1,7 @@
 import pygame as pg
+import random
+
+os.environe('SOL_VIDEO_CENTERED') = '1'
 
 SIZE = WIDTH, HEIGHT = 800, 600
 GREY = (128, 128, 128)
@@ -17,6 +20,8 @@ bg_image = pg.image.load('Image/road.jpg')
 bg_image_rect = bg_image.get_rect(topleft=(0, 0))
 bg_image_2_rect = bg_image.get_rect(topleft=(0, -HEIGHT))
 '''
+cars = [pg.image.load('Image/car1.png'), pg.image.load('Image/car2.png'),
+    pg.image.load('Image/car3.png')]
 
 
 class Road(pg.sprite.Sprite):
@@ -33,24 +38,53 @@ class Road(pg.sprite.Sprite):
                     self.image, WHITE,
                     (40 + xx * 80, 0 if xx == 0 or xx == 9 else 10 + yy * 60),
                     (40 + xx * 80, 600 if xx == 0 or xx == 9 else 50 + yy * 60), 5)
-        self.rect = self.image.get_rect(topleft=(x, y))
+        self.rect = self.image.get_rect(topleft=w(x, y))
         self.speed = 1
+
+    def update(self):
+        self.rect.y += self.speed
+        if self.rect.top >= HEIGHT:
+            self.rect.bottom = 0
 
 
 class Car(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, x, y, img):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.image.load('Image/car1.png')
+
+        self.image = pg.transform.flip(img, False, True)
+        self.speed = random.randint(2, 3)
+        self.rect = self.image.get_rect(center=(x, y))
+
+    def update(self):
+        self.rect.y += self.speed
+        if self.rect.top >= HEIGHT:
+            self.rect.bottom = 0  
+
+            list_x.remove(self.rect.centerx)
+            while True:
+                self.rect.centerx = ramdom.randrange(80, WIDTH, 80)
+                if self.rect.centerx in list_x:
+                    continue
+                else:
+                    list_x.append(self.rect.centerx)
+                    self.speed = random.randint(2, 3)
+                    break
 
 
 all_sprite = pg.sprite.Group()
 for r in range(2):
     all_sprite.add(Road(0, 0 if r == 0 else -HEIGHT))
 
-car1 = Car()
-car1_image = car1.image
-car1_w, car1_h = car1.image.get_width(), car1.image.get_height()
-car1.x, car1.y = (WIDTH - car1_w) // 2, (HEIGHT - car1_h) // 2
+list_x = []
+n = 0
+while n < 6:
+    x = random.randrange(80, WIDTH, 80) 
+    if x in list_x:
+        continue
+    else:
+        list_x.append(x)
+        all_sprite.add(Car(x, 0, cars[n] if n < len(cars) else random.choice(cars)))
+        n += 1
 
 game = True
 while game:
